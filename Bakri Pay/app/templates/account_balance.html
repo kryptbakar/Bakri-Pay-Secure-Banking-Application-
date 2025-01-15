@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+
+{% block title %}Account Balance{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2><i class="fas fa-balance-scale me-2"></i>Account Balance</h2>
+            <p class="lead">View your current account balance.</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a href="{{ url_for('accounts.get_accounts') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i>Back to Accounts
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mx-auto">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h3>Balance Information</h3>
+                </div>
+                <div class="card-body text-center">
+                    <p class="lead">Account ID</p>
+                    <h4 class="text-muted mb-4">{{ account_id }}</h4>
+                    
+                    <p class="lead">Current Balance</p>
+                    <h1 class="display-2 {% if balance > 0 %}text-success{% else %}text-danger{% endif %} mb-4">
+                        {{ "%.2f"|format(balance) }}
+                    </h1>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('accounts.transfer_funds', account_id=account_id) }}" class="btn btn-primary">
+                            <i class="fas fa-exchange-alt me-1"></i>Transfer Funds
+                        </a>
+                        <a href="{{ url_for('transactions.get_transactions', account_id=account_id) }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-history me-1"></i>View Transactions
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

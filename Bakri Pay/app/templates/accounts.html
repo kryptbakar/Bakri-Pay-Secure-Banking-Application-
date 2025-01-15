@@ -1,0 +1,152 @@
+{% extends "layout.html" %}
+
+{% block title %}Your Accounts{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2><i class="fas fa-wallet me-2"></i>Your Accounts</h2>
+            <p class="lead">Manage all your banking accounts in one place.</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a href="{{ url_for('accounts.create_account') }}" class="btn btn-primary">
+                <i class="fas fa-plus-circle me-1"></i>Create New Account
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Account List</h4>
+                </div>
+                <div class="card-body">
+                    {% if accounts %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Account Number</th>
+                                        <th>Balance</th>
+                                        <th>Status</th>
+                                        <th>Created</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for account in accounts %}
+                                    <tr>
+                                        <td>{{ account.account_number }}</td>
+                                        <td>{{ "%.2f"|format(account.balance) }}</td>
+                                        <td>
+                                            <span class="badge {% if account.status == 'active' %}bg-success{% else %}bg-secondary{% endif %}">
+                                                {{ account.status }}
+                                            </span>
+                                        </td>
+                                        <td>{{ account.created_at.strftime('%Y-%m-%d') }}</td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a href="{{ url_for('accounts.get_account_details', account_id=account.account_id) }}" 
+                                                   class="btn btn-sm btn-info" title="Details">
+                                                    <i class="fas fa-info-circle"></i>
+                                                </a>
+                                                <a href="{{ url_for('transactions.get_transactions', account_id=account.account_id) }}" 
+                                                   class="btn btn-sm btn-secondary" title="Transactions">
+                                                    <i class="fas fa-history"></i>
+                                                </a>
+                                                <a href="{{ url_for('accounts.transfer_funds', account_id=account.account_id) }}" 
+                                                   class="btn btn-sm btn-primary" title="Transfer">
+                                                    <i class="fas fa-exchange-alt"></i>
+                                                </a>
+                                                <a href="{{ url_for('cards.get_cards', account_id=account.account_id) }}" 
+                                                   class="btn btn-sm btn-warning" title="Cards">
+                                                    <i class="fas fa-credit-card"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>You don't have any accounts yet.
+                            <a href="{{ url_for('accounts.create_account') }}" class="alert-link">Create your first account</a>.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Account Stats -->
+    {% if accounts %}
+    <div class="row mt-4">
+        <div class="col-md-4 mb-4">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5 class="card-title">Total Balance</h5>
+                    <h2 class="card-text">
+                        {{ "%.2f"|format(accounts|sum(attribute='balance')) }}
+                    </h2>
+                    <p class="card-text">Across all accounts</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">Active Accounts</h5>
+                    <h2 class="card-text">
+                        {{ accounts|selectattr('status', 'equalto', 'active')|list|length }}
+                    </h2>
+                    <p class="card-text">Ready for transactions</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <h5 class="card-title">Total Accounts</h5>
+                    <h2 class="card-text">{{ accounts|length }}</h2>
+                    <p class="card-text">Manage all in one place</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Account Actions -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Quick Actions</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <a href="{{ url_for('accounts.create_account') }}" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-plus-circle me-2"></i>New Account
+                            </a>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <a href="{{ url_for('transactions.get_transactions') }}" class="btn btn-outline-secondary w-100">
+                                <i class="fas fa-history me-2"></i>View All Transactions
+                            </a>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <a href="{{ url_for('cards.get_cards') }}" class="btn btn-outline-warning w-100">
+                                <i class="fas fa-credit-card me-2"></i>Manage Cards
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,214 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    {% if action == 'login' %}
+        Login | Bakri Pay
+    {% else %}
+        Register | Bakri Pay
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="auth-container fade-in">
+    <div class="auth-logo">
+        <i class="fas fa-coins"></i>
+        <h2 class="mt-3 brand-text">Bakri Pay</h2>
+        <p class="text-muted">Modern Banking for Everyone</p>
+    </div>
+
+    {% if error %}
+    <div class="alert glass-alert alert-danger">
+        <i class="fas fa-exclamation-circle me-2"></i>{{ error }}
+    </div>
+    {% endif %}
+    
+    {% if action == 'login' %}
+    <!-- Login Form -->
+    <form method="POST" action="{{ url_for('auth.login') }}" class="slide-in">
+        <div class="mb-4">
+            <label for="mobile_number" class="form-label">Mobile Number</label>
+            <div class="input-group input-group-lg">
+                <span class="input-group-text bg-glass"><i class="fas fa-phone"></i></span>
+                <input type="tel" class="form-control" id="mobile_number" name="mobile_number" 
+                        placeholder="+92 3XX XXXXXXX" required>
+            </div>
+            <div class="form-text">
+                <i class="fas fa-info-circle me-1"></i>Enter with country code (e.g., +923001234567)
+            </div>
+        </div>
+        
+        <div class="mb-4">
+            <label for="pin" class="form-label">PIN</label>
+            <div class="input-group input-group-lg">
+                <span class="input-group-text bg-glass"><i class="fas fa-lock"></i></span>
+                <input type="password" class="form-control" id="pin" name="pin" 
+                        placeholder="••••••" minlength="4" maxlength="6" required>
+            </div>
+        </div>
+        
+        <div class="d-grid gap-2 mb-4">
+            <button type="submit" class="btn btn-bakri btn-lg">
+                <i class="fas fa-sign-in-alt me-2"></i>Login
+            </button>
+        </div>
+        
+        <div class="text-center">
+            <p>Don't have an account? <a href="{{ url_for('auth.register') }}" class="brand-text">Register</a></p>
+        </div>
+    </form>
+    {% else %}
+    <!-- Registration Form -->
+    <form method="POST" action="{{ url_for('auth.register') }}" class="slide-in">
+        <div class="mb-3">
+            <label for="full_name" class="form-label">Full Name</label>
+            <div class="input-group">
+                <span class="input-group-text bg-glass"><i class="fas fa-user"></i></span>
+                <input type="text" class="form-control" id="full_name" name="full_name" 
+                        placeholder="Enter your full name" required>
+            </div>
+        </div>
+        
+        <div class="mb-3">
+            <label for="mobile_number" class="form-label">Mobile Number</label>
+            <div class="input-group">
+                <span class="input-group-text bg-glass"><i class="fas fa-phone"></i></span>
+                <input type="tel" class="form-control" id="mobile_number" name="mobile_number" 
+                        placeholder="+92 3XX XXXXXXX" required>
+            </div>
+            <div class="form-text">
+                <i class="fas fa-info-circle me-1"></i>Pakistan format required (e.g., +923001234567)
+            </div>
+        </div>
+        
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <div class="input-group">
+                <span class="input-group-text bg-glass"><i class="fas fa-envelope"></i></span>
+                <input type="email" class="form-control" id="email" name="email" 
+                        placeholder="Enter your email" required>
+            </div>
+        </div>
+        
+        <div class="mb-3">
+            <label for="cnic_number" class="form-label">CNIC Number</label>
+            <div class="input-group">
+                <span class="input-group-text bg-glass"><i class="fas fa-id-card"></i></span>
+                <input type="text" class="form-control" id="cnic_number" name="cnic_number" 
+                        placeholder="XXXXX-XXXXXXX-X" pattern="\d{5}-\d{7}-\d{1}" required>
+            </div>
+            <div class="form-text">
+                <i class="fas fa-info-circle me-1"></i>Format: XXXXX-XXXXXXX-X
+            </div>
+        </div>
+        
+        <div class="mb-3">
+            <label for="pin" class="form-label">PIN</label>
+            <div class="input-group">
+                <span class="input-group-text bg-glass"><i class="fas fa-lock"></i></span>
+                <input type="password" class="form-control" id="pin" name="pin" 
+                        placeholder="Create a PIN" minlength="4" maxlength="6" required>
+            </div>
+            <div class="form-text">
+                <i class="fas fa-shield-alt me-1"></i>PIN must be 4-6 digits with sufficient variation
+            </div>
+        </div>
+        
+        <div class="mb-4">
+            <label for="confirm_pin" class="form-label">Confirm PIN</label>
+            <div class="input-group">
+                <span class="input-group-text bg-glass"><i class="fas fa-lock"></i></span>
+                <input type="password" class="form-control" id="confirm_pin" name="confirm_pin"
+                        placeholder="Confirm your PIN" minlength="4" maxlength="6" required>
+            </div>
+        </div>
+        
+        <div class="d-grid gap-2 mb-4">
+            <button type="submit" class="btn btn-bakri btn-lg">
+                <i class="fas fa-user-plus me-2"></i>Register
+            </button>
+        </div>
+        
+        <div class="text-center">
+            <p>Already have an account? <a href="{{ url_for('auth.login') }}" class="brand-text">Login</a></p>
+        </div>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // For registration form PIN matching validation
+    {% if action == 'register' %}
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form');
+        const pin = document.getElementById('pin');
+        const confirmPin = document.getElementById('confirm_pin');
+
+        form.addEventListener('submit', function(event) {
+            if (pin.value !== confirmPin.value) {
+                event.preventDefault();
+                
+                // Create a more elegant toast notification instead of alert
+                const toastContainer = document.createElement('div');
+                toastContainer.className = 'toast-container';
+                toastContainer.innerHTML = `
+                    <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="toast-header">
+                            <i class="fas fa-exclamation-circle text-danger me-2"></i>
+                            <strong class="me-auto">Error</strong>
+                            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                        <div class="toast-body">
+                            PINs do not match. Please try again.
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(toastContainer);
+                
+                // Highlight the fields with error
+                confirmPin.classList.add('is-invalid');
+                setTimeout(() => {
+                    const closeButton = document.querySelector('.toast .btn-close');
+                    if (closeButton) {
+                        closeButton.addEventListener('click', function() {
+                            toastContainer.remove();
+                        });
+                    }
+                    
+                    // Auto remove after 5 seconds
+                    setTimeout(() => {
+                        if (document.body.contains(toastContainer)) {
+                            toastContainer.remove();
+                        }
+                    }, 5000);
+                }, 100);
+                
+                confirmPin.focus();
+            }
+        });
+        
+        // Remove invalid state once user starts typing again
+        confirmPin.addEventListener('input', function() {
+            confirmPin.classList.remove('is-invalid');
+        });
+    });
+    {% endif %}
+    
+    // Add some subtle animation to the form fields
+    document.addEventListener('DOMContentLoaded', function() {
+        const formInputs = document.querySelectorAll('.form-control');
+        
+        formInputs.forEach((input, index) => {
+            input.style.opacity = '0';
+            input.style.transform = 'translateY(10px)';
+            input.style.transition = 'all 0.3s ease';
+            
+            setTimeout(() => {
+                input.style.opacity = '1';
+                input.style.transform = 'translateY(0)';
+            }, 100 + (index * 50));
+        });
+    });
+</script>
+{% endblock %}

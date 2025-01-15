@@ -1,0 +1,128 @@
+{% extends "layout.html" %}
+
+{% block title %}Transaction Details{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2><i class="fas fa-receipt me-2"></i>Transaction Details</h2>
+            <p class="lead">View detailed information about this transaction.</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a href="{{ url_for('transactions.get_transactions') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i>Back to Transactions
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h3>
+                        {% if transaction.transaction_type == 'transfer' %}
+                            <i class="fas fa-exchange-alt me-2"></i>Transfer
+                        {% elif transaction.transaction_type == 'deposit' %}
+                            <i class="fas fa-money-bill-wave me-2"></i>Deposit
+                        {% else %}
+                            <i class="fas fa-wallet me-2"></i>{{ transaction.transaction_type | capitalize }}
+                        {% endif %}
+                    </h3>
+                    <p class="text-muted mb-0">Transaction ID: {{ transaction.transaction_id }}</p>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-12 text-center">
+                            <h1 class="display-4 {% if transaction.from_account_id %}text-danger{% else %}text-success{% endif %}">
+                                {% if transaction.from_account_id %}
+                                    - {{ "%.2f"|format(transaction.amount) }}
+                                {% else %}
+                                    + {{ "%.2f"|format(transaction.amount) }}
+                                {% endif %}
+                            </h1>
+                            <span class="badge bg-{{ 'success' if transaction.status == 'completed' else 'warning' if transaction.status == 'pending' else 'danger' }} fs-6">
+                                {{ transaction.status | capitalize }}
+                            </span>
+                            {% if transaction.is_fraudulent %}
+                                <span class="badge bg-danger fs-6 ms-2">Flagged as Suspicious</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p class="text-muted mb-1">Date</p>
+                            <p class="fs-5">{{ transaction.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="text-muted mb-1">Reference</p>
+                            <p class="fs-5">{{ transaction.reference or 'No reference' }}</p>
+                        </div>
+                    </div>
+                    
+                    {% if transaction.transaction_type == 'transfer' %}
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p class="text-muted mb-1">From Account</p>
+                            <p class="fs-5">{{ transaction.sender_account.account_number }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="text-muted mb-1">To Account</p>
+                            <p class="fs-5">{{ transaction.receiver_account.account_number }}</p>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p class="text-muted mb-1">To Account</p>
+                            <p class="fs-5">{{ transaction.receiver_account.account_number }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="text-muted mb-1">Type</p>
+                            <p class="fs-5">{{ transaction.transaction_type | capitalize }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if transaction.completed_at %}
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p class="text-muted mb-1">Completed At</p>
+                            <p class="fs-5">{{ transaction.completed_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if transaction.fraud_alerts %}
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="alert alert-warning">
+                                <h5><i class="fas fa-exclamation-triangle me-2"></i>Fraud Alerts</h5>
+                                <ul class="mb-0">
+                                    {% for alert in transaction.fraud_alerts %}
+                                    <li>{{ alert.reason }} ({{ alert.created_at.strftime('%Y-%m-%d %H:%M') }})</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer text-center">
+                    {% if transaction.transaction_type == 'transfer' %}
+                    <a href="{{ url_for('accounts.transfer_funds', account_id=transaction.from_account_id) }}" class="btn btn-primary">
+                        <i class="fas fa-redo me-1"></i>Make Another Transfer
+                    </a>
+                    {% endif %}
+                    <a href="{{ url_for('transactions.get_transactions') }}" class="btn btn-outline-secondary ms-2">
+                        <i class="fas fa-list me-1"></i>All Transactions
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

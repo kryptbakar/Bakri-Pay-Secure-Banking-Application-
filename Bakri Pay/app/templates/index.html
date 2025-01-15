@@ -1,0 +1,78 @@
+{% extends "layout.html" %}
+
+{% block title %}Banking System - Home{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="p-5 mb-4 bg-light rounded-3 text-center">
+        <div class="container-fluid py-5">
+            <h1 class="display-5 fw-bold">Secure Banking Solutions</h1>
+            <p class="fs-4">Welcome to our modern banking platform. Manage accounts, make transactions, and control your cards with our secure and easy-to-use interface.</p>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                {% if not session.get('user_id') %}
+                <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg px-4 me-md-2">
+                    <i class="fas fa-sign-in-alt me-2"></i>Login
+                </a>
+                <a href="{{ url_for('auth.register') }}" class="btn btn-outline-secondary btn-lg px-4">
+                    <i class="fas fa-user-plus me-2"></i>Register
+                </a>
+                {% else %}
+                <a href="{{ url_for('accounts.dashboard') }}" class="btn btn-primary btn-lg px-4">
+                    <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row align-items-md-stretch">
+        <div class="col-md-4 mb-4">
+            <div class="h-100 p-5 bg-dark text-white rounded-3">
+                <h2><i class="fas fa-wallet me-2"></i>Accounts</h2>
+                <p>Create and manage multiple accounts. Check balances, view transaction history, and manage your finances efficiently.</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="h-100 p-5 bg-dark text-white rounded-3">
+                <h2><i class="fas fa-exchange-alt me-2"></i>Transactions</h2>
+                <p>Transfer funds between accounts, deposit money, and keep track of all your financial activities.</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="h-100 p-5 bg-dark text-white rounded-3">
+                <h2><i class="fas fa-credit-card me-2"></i>Cards</h2>
+                <p>Manage your virtual and physical cards. Create new cards, activate or deactivate them, and report lost cards.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card text-center">
+                <div class="card-header">
+                    <h3>Why Choose Us</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <i class="fas fa-shield-alt fa-3x mb-3"></i>
+                            <h4>Secure</h4>
+                            <p>Bank-grade security with state-of-the-art encryption and fraud detection.</p>
+                        </div>
+                        <div class="col-md-4">
+                            <i class="fas fa-bolt fa-3x mb-3"></i>
+                            <h4>Fast</h4>
+                            <p>Instant transfers and real-time transaction updates.</p>
+                        </div>
+                        <div class="col-md-4">
+                            <i class="fas fa-headset fa-3x mb-3"></i>
+                            <h4>24/7 Support</h4>
+                            <p>Our support team is always available to help you with any issues.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

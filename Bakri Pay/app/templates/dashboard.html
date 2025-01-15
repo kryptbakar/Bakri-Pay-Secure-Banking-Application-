@@ -1,0 +1,623 @@
+{% extends "layout.html" %}
+
+{% block title %}Dashboard | Bakri Pay{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Welcome Banner -->
+    <div class="row mb-4 fade-in">
+        <div class="col-12">
+            <div class="glass-card">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h2 class="mb-3 brand-text">Welcome to Bakri Pay</h2>
+                            <h4>Hello, {{ current_user.full_name if current_user.full_name else 'User' }}!</h4>
+                            <p class="lead text-muted">Manage your finances with our modern banking solution.</p>
+                            <div class="d-flex gap-2 mt-4">
+                                <form action="{{ url_for('accounts.create_account') }}" method="POST" class="me-2">
+                                    <button type="submit" class="btn btn-bakri">
+                                        <i class="fas fa-plus-circle me-2"></i>New Account
+                                    </button>
+                                </form>
+                                <a href="{{ url_for('transactions.get_transactions') }}" class="btn btn-outline-bakri">
+                                    <i class="fas fa-exchange-alt me-2"></i>Transactions
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center d-none d-md-block">
+                            <i class="fas fa-coins display-1 brand-icon pulse"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Financial Overview -->
+    <div class="row mb-4 fade-in" style="animation-delay: 0.1s;">
+        <div class="col-12 mb-3">
+            <h4 class="mb-3"><i class="fas fa-chart-line me-2"></i>Financial Overview</h4>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="stats-card">
+                <i class="fas fa-wallet stats-icon"></i>
+                <h5 class="text-muted">Total Balance</h5>
+                <h3 class="stats-value">
+                    <span id="total-balance">
+                        <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </span>
+                </h3>
+                <p class="text-muted">Across all accounts</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="stats-card">
+                <i class="fas fa-exchange-alt stats-icon"></i>
+                <h5 class="text-muted">Recent Activity</h5>
+                <h3 class="stats-value">
+                    <span id="recent-transactions-count">
+                        <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </span>
+                </h3>
+                <p class="text-muted">Transactions this month</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="stats-card">
+                <i class="fas fa-credit-card stats-icon"></i>
+                <h5 class="text-muted">Active Cards</h5>
+                <h3 class="stats-value">
+                    <span id="active-cards-count">
+                        <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </span>
+                </h3>
+                <p class="text-muted">Ready to use</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Account Summary -->
+    <div class="row mb-4 fade-in" style="animation-delay: 0.2s;">
+        <div class="col-12">
+            <div class="glass-card">
+                <div class="card-header d-flex justify-content-between align-items-center bg-transparent border-bottom border-secondary">
+                    <h4 class="mb-0"><i class="fas fa-wallet me-2 brand-icon"></i>Your Accounts</h4>
+                    <form action="{{ url_for('accounts.create_account') }}" method="POST" class="d-inline">
+                        <button type="submit" class="btn btn-bakri btn-sm">
+                            <i class="fas fa-plus me-1"></i>New Account
+                        </button>
+                    </form>
+                </div>
+                <div class="card-body">
+                    {% if accounts %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Account Number</th>
+                                        <th>Balance</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for account in accounts %}
+                                    <tr class="account-row" data-account-id="{{ account.account_id }}">
+                                        <td>{{ account.account_number }}</td>
+                                        <td class="balance-cell">
+                                            <span class="fw-bold {% if account.balance >= 0 %}balance-positive{% else %}balance-negative{% endif %}">
+                                                {{ "%.2f"|format(account.balance) }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge rounded-pill bg-glass {% if account.status == 'active' %}text-success border border-success{% else %}text-secondary border border-secondary{% endif %}">
+                                                <i class="fas {% if account.status == 'active' %}fa-check-circle{% else %}fa-times-circle{% endif %} me-1"></i>
+                                                {{ account.status }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a href="{{ url_for('accounts.get_account_details', account_id=account.account_id) }}" 
+                                                   class="btn btn-sm btn-outline-info" title="Details">
+                                                    <i class="fas fa-info-circle"></i>
+                                                </a>
+                                                <a href="{{ url_for('transactions.get_transactions', account_id=account.account_id) }}" 
+                                                   class="btn btn-sm btn-outline-secondary" title="Transactions">
+                                                    <i class="fas fa-history"></i>
+                                                </a>
+                                                <a href="{{ url_for('accounts.transfer_funds', account_id=account.account_id) }}" 
+                                                   class="btn btn-sm btn-bakri" title="Transfer">
+                                                    <i class="fas fa-exchange-alt"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert glass-alert">
+                            <i class="fas fa-info-circle me-2"></i>You don't have any accounts yet.
+                            <form action="{{ url_for('accounts.create_account') }}" method="POST" class="d-inline">
+                                <button type="submit" class="btn-link alert-link brand-text p-0 m-0 border-0 bg-transparent" style="text-decoration: underline;">
+                                    Create your first account
+                                </button>
+                            </form>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activity and Cards -->
+    <div class="row">
+        <!-- Recent Transactions -->
+        <div class="col-md-6 mb-4 fade-in" style="animation-delay: 0.3s;">
+            <div class="glass-card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center bg-transparent border-bottom border-secondary">
+                    <h4 class="mb-0"><i class="fas fa-exchange-alt me-2 brand-icon"></i>Recent Activity</h4>
+                    <a href="{{ url_for('transactions.get_transactions') }}" class="btn btn-outline-bakri btn-sm">View All</a>
+                </div>
+                <div class="card-body">
+                    <div id="recent-transactions-loading" class="text-center">
+                        <div class="spinner-border" style="color: var(--bakri-primary);" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    <div id="recent-transactions-content" style="display: none;">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cards Summary -->
+        <div class="col-md-6 mb-4 fade-in" style="animation-delay: 0.4s;">
+            <div class="glass-card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center bg-transparent border-bottom border-secondary">
+                    <h4 class="mb-0"><i class="fas fa-credit-card me-2 brand-icon"></i>Your Cards</h4>
+                    <a href="{{ url_for('cards.get_cards') }}" class="btn btn-outline-bakri btn-sm">View All</a>
+                </div>
+                <div class="card-body">
+                    <div id="cards-loading" class="text-center">
+                        <div class="spinner-border" style="color: var(--bakri-primary);" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    <div id="cards-content" style="display: none;">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4 fade-in" style="animation-delay: 0.5s;">
+        <div class="col-12">
+            <div class="glass-card">
+                <div class="card-header bg-transparent border-bottom border-secondary">
+                    <h4><i class="fas fa-bolt me-2 brand-icon"></i>Quick Actions</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3 col-6 mb-3">
+                            <form action="{{ url_for('accounts.create_account') }}" method="POST">
+                                <button type="submit" class="quick-action-btn w-100 border-0">
+                                    <div class="quick-action-icon">
+                                        <i class="fas fa-plus-circle"></i>
+                                    </div>
+                                    <span>New Account</span>
+                                </button>
+                            </form>
+                        </div>
+                        <div class="col-md-3 col-6 mb-3">
+                            <a href="{{ url_for('transactions.get_transactions') }}" class="quick-action-btn">
+                                <div class="quick-action-icon">
+                                    <i class="fas fa-list"></i>
+                                </div>
+                                <span>Transactions</span>
+                            </a>
+                        </div>
+                        <div class="col-md-3 col-6 mb-3">
+                            <a href="{{ url_for('cards.get_cards') }}" class="quick-action-btn">
+                                <div class="quick-action-icon">
+                                    <i class="fas fa-credit-card"></i>
+                                </div>
+                                <span>Manage Cards</span>
+                            </a>
+                        </div>
+                        <div class="col-md-3 col-6 mb-3">
+                            <a href="#" class="quick-action-btn">
+                                <div class="quick-action-icon">
+                                    <i class="fas fa-user-cog"></i>
+                                </div>
+                                <span>Settings</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Activity Chart (for illustration) -->
+    <div class="row mb-4 fade-in" style="animation-delay: 0.6s;">
+        <div class="col-12">
+            <div class="glass-card">
+                <div class="card-header bg-transparent border-bottom border-secondary">
+                    <h4><i class="fas fa-chart-line me-2 brand-icon"></i>Activity Overview</h4>
+                </div>
+                <div class="card-body p-4">
+                    <canvas id="activityChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.quick-action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.25rem 0.5rem;
+    color: var(--bs-light);
+    text-decoration: none;
+    border-radius: 15px;
+    transition: all 0.3s ease;
+    background: rgba(33, 37, 41, 0.4);
+    height: 100%;
+}
+
+.quick-action-btn:hover {
+    background: rgba(142, 68, 173, 0.2);
+    transform: translateY(-5px);
+    color: var(--bakri-primary);
+}
+
+.quick-action-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: var(--bakri-primary);
+    transition: all 0.3s ease;
+}
+
+.quick-action-btn:hover .quick-action-icon {
+    transform: scale(1.2);
+}
+
+.account-row {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.account-row:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.transaction-item {
+    position: relative;
+    overflow: hidden;
+}
+
+.transaction-item::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 4px;
+    background: transparent;
+    transition: all 0.3s ease;
+}
+
+.transaction-item.debit::after {
+    background: var(--bakri-danger);
+}
+
+.transaction-item.credit::after {
+    background: var(--bakri-success);
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Calculate total balance
+        let totalBalance = 0;
+        {% if accounts %}
+        {% for account in accounts %}
+        totalBalance += {{ account.balance }};
+        {% endfor %}
+        document.getElementById('total-balance').innerHTML = totalBalance.toFixed(2);
+        {% else %}
+        document.getElementById('total-balance').innerHTML = '0.00';
+        {% endif %}
+        
+        // Fetch recent transactions
+        fetch('{{ url_for("transactions.get_transactions") }}?limit=5', {
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('recent-transactions-content');
+            document.getElementById('recent-transactions-loading').style.display = 'none';
+            container.style.display = 'block';
+            
+            if (data.length === 0) {
+                container.innerHTML = '<div class="alert glass-alert">No transactions found.</div>';
+                document.getElementById('recent-transactions-count').innerHTML = '0';
+                return;
+            }
+            
+            // Update stats count
+            document.getElementById('recent-transactions-count').innerHTML = data.length;
+            
+            let html = '<div class="list-group bg-transparent">';
+            data.forEach(transaction => {
+                const amount = parseFloat(transaction.amount).toFixed(2);
+                const isDebit = transaction.from_account !== null;
+                const icon = isDebit ? 'fa-arrow-up text-danger' : 'fa-arrow-down text-success';
+                const prefix = isDebit ? '-' : '+';
+                const date = new Date(transaction.timestamp);
+                const formattedDate = date.toLocaleDateString();
+                const formattedTime = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                
+                html += `
+                <a href="{{ url_for('transactions.get_transaction_details', transaction_id='') }}${transaction.transaction_id}" 
+                   class="list-group-item list-group-item-action bg-transparent border-0 transaction-item ${isDebit ? 'debit' : 'credit'}">
+                    <div class="d-flex w-100 justify-content-between align-items-center py-2">
+                        <div>
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <i class="fas ${icon} fa-lg"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold">
+                                        ${transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}
+                                    </h6>
+                                    <div class="transaction-time">
+                                        <small>${formattedDate} • ${formattedTime}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="transaction-amount ${isDebit ? 'debit' : 'credit'}">${prefix}${amount}</span>
+                    </div>
+                </a>`;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        })
+        .catch(error => {
+            console.error('Error fetching transactions:', error);
+            document.getElementById('recent-transactions-loading').style.display = 'none';
+            document.getElementById('recent-transactions-content').style.display = 'block';
+            document.getElementById('recent-transactions-content').innerHTML = 
+                '<div class="alert glass-alert">Failed to load transactions.</div>';
+            document.getElementById('recent-transactions-count').innerHTML = '0';
+        });
+        
+        // Fetch cards
+        fetch('{{ url_for("cards.get_cards") }}', {
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('cards-content');
+            document.getElementById('cards-loading').style.display = 'none';
+            container.style.display = 'block';
+            
+            // Update stats - count active cards
+            const activeCards = data.filter(card => card.is_active).length;
+            document.getElementById('active-cards-count').innerHTML = activeCards;
+            
+            if (data.length === 0) {
+                container.innerHTML = `
+                <div class="alert glass-alert">
+                    No cards found. <a href="{{ url_for('cards.get_cards') }}" class="alert-link brand-text">Create a card</a>.
+                </div>`;
+                return;
+            }
+            
+            // Display cards in a more modern way
+            let html = '<div class="row">';
+            data.slice(0, 2).forEach((card, index) => {
+                html += `
+                <div class="col-12 mb-3">
+                    <div class="credit-card ${card.is_active ? '' : 'inactive'}">
+                        <div class="credit-card-content">
+                            <div class="card-chip"></div>
+                            <div class="card-number">**** **** **** ${card.last_four || '1234'}</div>
+                            <div class="row mt-4">
+                                <div class="col-6">
+                                    <div class="card-holder text-uppercase">
+                                        <small>CARD HOLDER</small><br>
+                                        ${current_user.full_name || 'Card Holder'}
+                                    </div>
+                                </div>
+                                <div class="col-6 text-end">
+                                    <div class="card-expiry">
+                                        <small>EXPIRES</small><br>
+                                        ${card.expiry_date || '12/28'}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-brand">
+                                <i class="fab fa-cc-visa"></i>
+                            </div>
+                            <div class="position-absolute top-0 end-0 m-3">
+                                <span class="badge rounded-pill ${card.is_virtual ? 'bg-info' : 'bg-warning'}">
+                                    ${card.is_virtual ? 'Virtual' : 'Physical'}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            });
+            html += '</div>';
+            
+            if (data.length > 2) {
+                html += `
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('cards.get_cards') }}" class="btn btn-sm btn-outline-bakri">
+                        View All ${data.length} Cards
+                    </a>
+                </div>`;
+            }
+            
+            container.innerHTML = html;
+        })
+        .catch(error => {
+            console.error('Error fetching cards:', error);
+            document.getElementById('cards-loading').style.display = 'none';
+            document.getElementById('cards-content').style.display = 'block';
+            document.getElementById('cards-content').innerHTML = 
+                '<div class="alert glass-alert">Failed to load cards.</div>';
+            document.getElementById('active-cards-count').innerHTML = '0';
+        });
+        
+        // Create activity chart
+        const ctx = document.getElementById('activityChart').getContext('2d');
+        
+        const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const incomeData = [4500, 5200, 4700, 5800, 6200, 5600, 7000, 6300, 6800, 7200, 7500, 8000];
+        const expenseData = [3800, 4100, 3900, 4500, 5100, 4800, 5500, 4900, 5200, 5600, 5800, 6100];
+        
+        // Create gradient for chart
+        const incomeGradient = ctx.createLinearGradient(0, 0, 0, 400);
+        incomeGradient.addColorStop(0, 'rgba(46, 204, 113, 0.7)');
+        incomeGradient.addColorStop(1, 'rgba(46, 204, 113, 0.1)');
+        
+        const expenseGradient = ctx.createLinearGradient(0, 0, 0, 400);
+        expenseGradient.addColorStop(0, 'rgba(231, 76, 60, 0.7)');
+        expenseGradient.addColorStop(1, 'rgba(231, 76, 60, 0.1)');
+        
+        const activityChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Income',
+                        data: incomeData,
+                        backgroundColor: incomeGradient,
+                        borderColor: 'rgba(46, 204, 113, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(46, 204, 113, 1)',
+                        pointBorderColor: '#fff',
+                        pointRadius: 4,
+                        tension: 0.3,
+                        fill: true
+                    },
+                    {
+                        label: 'Expenses',
+                        data: expenseData,
+                        backgroundColor: expenseGradient,
+                        borderColor: 'rgba(231, 76, 60, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(231, 76, 60, 1)',
+                        pointBorderColor: '#fff',
+                        pointRadius: 4,
+                        tension: 0.3,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            color: 'rgba(255, 255, 255, 0.7)',
+                            font: {
+                                size: 12,
+                                family: "'Segoe UI', sans-serif"
+                            }
+                        }
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        backgroundColor: 'rgba(33, 37, 41, 0.9)',
+                        titleFont: {
+                            size: 14,
+                            family: "'Segoe UI', sans-serif"
+                        },
+                        bodyFont: {
+                            size: 13,
+                            family: "'Segoe UI', sans-serif"
+                        },
+                        padding: 10,
+                        caretSize: 6,
+                        displayColors: true,
+                        borderColor: 'rgba(255, 255, 255, 0.1)',
+                        borderWidth: 1
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)',
+                            borderDash: [5, 5]
+                        },
+                        ticks: {
+                            color: 'rgba(255, 255, 255, 0.7)',
+                            font: {
+                                size: 11,
+                                family: "'Segoe UI', sans-serif"
+                            },
+                            callback: function(value) {
+                                return '$' + value.toLocaleString();
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: 'rgba(255, 255, 255, 0.7)',
+                            font: {
+                                size: 11,
+                                family: "'Segoe UI', sans-serif"
+                            }
+                        }
+                    }
+                },
+                elements: {
+                    line: {
+                        tension: 0.4
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                animation: {
+                    duration: 1500,
+                    easing: 'easeOutQuart'
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

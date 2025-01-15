@@ -1,0 +1,152 @@
+{% extends "layout.html" %}
+
+{% block title %}Transfer Funds{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2><i class="fas fa-exchange-alt me-2"></i>Transfer Funds</h2>
+            <p class="lead">Transfer money from your account to another account.</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a href="{{ url_for('accounts.get_account_details', account_id=account.account_id) }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i>Back to Account
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Transfer Details</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('accounts.transfer_funds', account_id=account.account_id) }}" id="transfer-form">
+                        <div class="mb-3">
+                            <label for="from_account" class="form-label">From Account</label>
+                            <input type="text" class="form-control" id="from_account" value="{{ account.account_number }}" readonly>
+                            <div class="form-text">Available Balance: {{ "%.2f"|format(account.balance) }}</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="to_account" class="form-label">To Account</label>
+                            <input type="text" class="form-control" id="to_account" name="to_account" placeholder="Enter recipient account ID" required>
+                            <div class="form-text">Enter the account ID of the recipient</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="amount" class="form-label">Amount</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="amount" name="amount" min="0.01" step="0.01" required>
+                            </div>
+                            <div class="form-text">Enter amount to transfer</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="reference" class="form-label">Reference (Optional)</label>
+                            <input type="text" class="form-control" id="reference" name="reference" placeholder="e.g., Rent payment">
+                            <div class="form-text">Add a note or reference for this transfer</div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary" id="submit-transfer">
+                                <i class="fas fa-paper-plane me-1"></i>Send Transfer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Transfer Information -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h4>Transfer Information</h4>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li>Transfers are processed immediately</li>
+                        <li>Make sure the recipient account ID is correct</li>
+                        <li>You cannot transfer more than your available balance</li>
+                        <li>Transfer amounts must be positive</li>
+                        <li>Transfers cannot be canceled once processed</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmTransferModal" tabindex="-1" aria-labelledby="confirmTransferModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmTransferModalLabel">Confirm Transfer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Please review your transfer details:</p>
+                <p><strong>From:</strong> <span id="confirm-from"></span></p>
+                <p><strong>To:</strong> <span id="confirm-to"></span></p>
+                <p><strong>Amount:</strong> $<span id="confirm-amount"></span></p>
+                <p><strong>Reference:</strong> <span id="confirm-reference"></span></p>
+                <p class="text-danger">This action cannot be undone. Are you sure you want to proceed?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirm-transfer">Confirm Transfer</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('transfer-form');
+        const submitBtn = document.getElementById('submit-transfer');
+        const confirmBtn = document.getElementById('confirm-transfer');
+        const modal = new bootstrap.Modal(document.getElementById('confirmTransferModal'));
+        
+        // Set max amount based on balance
+        const amountInput = document.getElementById('amount');
+        amountInput.max = {{ account.balance }};
+        
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            // Validate amount
+            const amount = parseFloat(amountInput.value);
+            const balance = {{ account.balance }};
+            
+            if (amount <= 0) {
+                alert('Amount must be positive');
+                return;
+            }
+            
+            if (amount > balance) {
+                alert('Insufficient funds for this transfer');
+                return;
+            }
+            
+            // Populate confirmation modal
+            document.getElementById('confirm-from').textContent = '{{ account.account_number }}';
+            document.getElementById('confirm-to').textContent = document.getElementById('to_account').value;
+            document.getElementById('confirm-amount').textContent = amount.toFixed(2);
+            document.getElementById('confirm-reference').textContent = document.getElementById('reference').value || 'None';
+            
+            // Show confirmation modal
+            modal.show();
+        });
+        
+        confirmBtn.addEventListener('click', function() {
+            // Submit the form
+            form.submit();
+        });
+    });
+</script>
+{% endblock %}
