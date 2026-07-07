@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bakri Pay — Secure Banking Platform</title>
+<style>
+  :root {
+    --bg: #f4f7fb;
+    --bg-alt: #ffffff;
+    --text: #10233b;
+    --text-muted: #4b5d75;
+    --accent: #0f6e5e;
+    --accent-2: #1a4d8f;
+    --border: #dde5ef;
+    --card-shadow: 0 4px 18px rgba(16, 35, 59, 0.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0c1420;
+      --bg-alt: #121c2b;
+      --text: #e8eef6;
+      --text-muted: #a9b8cc;
+      --accent: #35d6ae;
+      --accent-2: #6ea8fe;
+      --border: #223046;
+      --card-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+  header.hero {
+    padding: 88px 0 64px;
+    text-align: center;
+    background: linear-gradient(180deg, var(--bg-alt) 0%, var(--bg) 100%);
+    border-bottom: 1px solid var(--border);
+  }
+  .logo-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    font-size: 30px;
+    margin-bottom: 20px;
+  }
+  h1 {
+    font-size: clamp(2.2rem, 5vw, 3.2rem);
+    margin: 0 0 12px;
+    letter-spacing: -0.02em;
+  }
+  .tagline {
+    font-size: 1.15rem;
+    color: var(--text-muted);
+    max-width: 620px;
+    margin: 0 auto 28px;
+  }
+  .cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-block;
+    padding: 12px 24px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+  }
+  .btn:hover { transform: translateY(-1px); opacity: 0.92; }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #fff;
+  }
+  .btn-secondary {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  section { padding: 56px 0; }
+  section + section { border-top: 1px solid var(--border); }
+  h2 {
+    font-size: 1.6rem;
+    margin: 0 0 20px;
+    letter-spacing: -0.01em;
+  }
+  .about-text { color: var(--text-muted); font-size: 1.05rem; max-width: 760px; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 18px;
+    margin-top: 8px;
+  }
+  .card {
+    background: var(--bg-alt);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 22px;
+    box-shadow: var(--card-shadow);
+  }
+  .card .icon { font-size: 1.4rem; margin-bottom: 8px; display: block; }
+  .card h3 { margin: 0 0 6px; font-size: 1.02rem; }
+  .card p { margin: 0; color: var(--text-muted); font-size: 0.92rem; }
+  .tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+  .tag {
+    background: var(--bg-alt);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 7px 14px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .resources { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 8px; }
+  .res-card {
+    flex: 1 1 260px;
+    background: var(--bg-alt);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 22px;
+    text-decoration: none;
+    color: var(--text);
+    box-shadow: var(--card-shadow);
+  }
+  .res-card:hover { border-color: var(--accent-2); }
+  .res-card h3 { margin: 0 0 6px; font-size: 1rem; }
+  .res-card p { margin: 0; color: var(--text-muted); font-size: 0.88rem; }
+  footer {
+    padding: 36px 0 56px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+  footer a { color: var(--accent-2); text-decoration: none; }
+  .disclaimer {
+    max-width: 700px;
+    margin: 18px auto 0;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    opacity: 0.85;
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="logo-badge">🏦</div>
+    <h1>Bakri Pay</h1>
+    <p class="tagline">A secure banking platform built to explore fraud-resistant, encrypted, and auditable digital payments.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="Bakri-Pay%20Report.docx">Read the Report</a>
+      <a class="btn btn-secondary" href="https://github.com/kryptbakar/Bakri-Pay-Secure-Banking-Application-">View on GitHub</a>
+    </div>
+  </div>
+</header>
+
+<section id="about">
+  <div class="wrap">
+    <h2>About</h2>
+    <p class="about-text">
+      Bakri Pay is a coursework banking application that models the core of a modern digital bank: user
+      accounts, instant peer-to-peer transfers, virtual card generation, and a financial analytics dashboard.
+      Security is treated as a first-class feature rather than an afterthought — the project layers biometric
+      login, AI-assisted fraud detection, and end-to-end encryption on top of standard banking workflows to
+      demonstrate how a production-grade fintech system should defend user funds and data.
+    </p>
+  </div>
+</section>
+
+<section id="security">
+  <div class="wrap">
+    <h2>Security Highlights</h2>
+    <div class="grid">
+      <div class="card">
+        <span class="icon">🔐</span>
+        <h3>End-to-End Encryption</h3>
+        <p>AES-256 for data at rest combined with TLS 1.3 in transit.</p>
+      </div>
+      <div class="card">
+        <span class="icon">🧬</span>
+        <h3>Biometric Authentication</h3>
+        <p>FaceID / fingerprint login alongside traditional credentials.</p>
+      </div>
+      <div class="card">
+        <span class="icon">🤖</span>
+        <h3>AI-Powered Fraud Detection</h3>
+        <p>Real-time analysis of transactions to flag anomalous activity.</p>
+      </div>
+      <div class="card">
+        <span class="icon">🪪</span>
+        <h3>JWT &amp; Session Management</h3>
+        <p>Refresh-token rotation to limit the blast radius of leaked tokens.</p>
+      </div>
+      <div class="card">
+        <span class="icon">🛡️</span>
+        <h3>Transaction Whitelisting</h3>
+        <p>Restrict transfers to pre-approved recipients and devices.</p>
+      </div>
+      <div class="card">
+        <span class="icon">🌐</span>
+        <h3>Hardened HTTP Layer</h3>
+        <p>Security headers and rate limiting to reduce common web attack surface.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="stack">
+  <div class="wrap">
+    <h2>Tech Stack</h2>
+    <div class="tags">
+      <span class="tag">Python</span>
+      <span class="tag">Flask</span>
+      <span class="tag">PostgreSQL</span>
+      <span class="tag">Redis</span>
+      <span class="tag">JWT / OAuth 2.0</span>
+      <span class="tag">AES-256</span>
+      <span class="tag">TLS 1.3</span>
+      <span class="tag">React</span>
+      <span class="tag">Docker</span>
+    </div>
+  </div>
+</section>
+
+<section id="resources">
+  <div class="wrap">
+    <h2>Resources</h2>
+    <div class="resources">
+      <a class="res-card" href="Bakri-Pay%20Report.docx">
+        <h3>📄 Full Project Report</h3>
+        <p>Design decisions, architecture, and security analysis (.docx)</p>
+      </a>
+      <a class="res-card" href="Bakri-Pay%20Bank%20.zip">
+        <h3>📦 Application Archive</h3>
+        <p>Packaged application source (.zip)</p>
+      </a>
+      <a class="res-card" href="https://github.com/kryptbakar/Bakri-Pay-Secure-Banking-Application-">
+        <h3>💻 Source on GitHub</h3>
+        <p>Browse the full repository</p>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>Bakri Pay — a Cyber Security coursework project. <a href="https://github.com/kryptbakar/Bakri-Pay-Secure-Banking-Application-">github.com/kryptbakar/Bakri-Pay-Secure-Banking-Application-</a></p>
+    <p class="disclaimer">This is an academic project built for learning and demonstration purposes and is not a production financial service.</p>
+  </div>
+</footer>
+
+</body>
+</html>
